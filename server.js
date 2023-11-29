@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/user", userRouter);
-app.use("/task", taskRouter);
+app.use("/tasks", taskRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello");
