@@ -10,11 +10,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 async function addNewUser(req, res) {
-  let { name, email, phone, password } = req.body;
+  let { name, email, phone, password } = req.body; // get data from request body
   name = name.trim();
   email = email.trim();
   phone = phone.trim();
   password = password.trim();
+
+  // validate input fields
   if (!name || !email || !phone || !password) {
     return res.status(400).json({ message: "Input fields cannot be empty!" });
   } else if (!/^[a-zA-Z ]*$/.test(name)) {
@@ -30,6 +32,7 @@ async function addNewUser(req, res) {
       .status(400)
       .json({ message: "Password must be atleast 8 characters long!" });
   } else {
+    // hash password
     let hashedPassword;
     try {
       const salt = await bcrypt.genSalt(10);
@@ -39,6 +42,7 @@ async function addNewUser(req, res) {
         message: `An error occured while hashing password: ${error.message}`,
       });
     }
+    // create new user
     const newUser = new User({
       name: name,
       email: email,
@@ -46,6 +50,7 @@ async function addNewUser(req, res) {
       password: hashedPassword,
     });
     try {
+      // check if email already exists
       const emailExist = await User.findOne({ email: email });
       if (emailExist) {
         return res.status(400).json({ message: "Email already exists!" });
@@ -55,6 +60,7 @@ async function addNewUser(req, res) {
         message: `An error occured while checking for email: ${error.message}`,
       });
     }
+    // save user
     let savedUser;
     try {
       savedUser = await newUser.save();
@@ -63,6 +69,7 @@ async function addNewUser(req, res) {
         message: `An error occured while saving user: ${error.message}`,
       });
     }
+    // create access token and refresh token
     const accessToken = jwt.sign(
       { userId: savedUser._id },
       process.env.ACCESS_TOKEN_SECRET,
@@ -73,6 +80,7 @@ async function addNewUser(req, res) {
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: process.env.REFRESH_TOKEN_LIFE }
     );
+    // save refresh token
     let expiresAt = new Date();
     expiresAt.setSeconds(
       expiresAt.getSeconds() + process.env.REFRESH_TOKEN_LIFE // life in seconds
