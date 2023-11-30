@@ -1,13 +1,11 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const User = require("../models/user.model");
 const RefreshToken = require("../models/refreshToken.model");
 
 require("dotenv").config();
-
-const jwt = require("jsonwebtoken");
-
-const bcrypt = require("bcrypt");
 
 async function addNewUser(req, res) {
   let { name, email, phone, password } = req.body; // get data from request body
@@ -109,61 +107,132 @@ async function addNewUser(req, res) {
   }
 }
 
-async function signinUser(req, res) {}
+async function signinUser(req, res) {
+  let { email, password } = req.body; // get data from request body
+  email = email.trim();
+  password = password.trim();
+  if (!email || !password) {
+    return res.status(400).json({ message: "Input fields cannot be empty!" });
+  } else {
+    let user;
+    try {
+      user = await User.findOne({ email: email });
+      if (!user) {
+        return res.status(400).json({ message: "Email does not exist!" });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        message: `An error occured while looking for user in the database: ${error.message}`,
+      });
+    }
+    // compare password
+    let validPassword = user.password;
+    try {
+      const isMatch = await bcrypt.compare(password, validPassword);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Invalid password!" });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        message: `An error occured while comparing passwords: ${error.message}`,
+      });
+    }
+    // create new access token and refresh token
+    const accessToken = jwt.sign(
+      { userId: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_LIFE }
+    );
+    const refreshToken = jwt.sign(
+      { userId: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: process.env.REFRESH_TOKEN_LIFE }
+    );
+    const expiresAt = new Date();
+    expiresAt.setSeconds(
+      expiresAt.getSeconds() + process.env.REFRESH_TOKEN_LIFE
+    );
+    // save refresh token
+    const newRefreshToken = new RefreshToken({
+      refreshToken: refreshToken,
+      userId: user._id,
+      expiresAt: expiresAt,
+    });
+    try {
+      let savedRefreshToken = await newRefreshToken.save();
+      return res.status(200).json({
+        message: "User signed in successfully!",
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        user: {
+          name: user.name,
+          email: user.email,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: `An error occured while saving refresh token: ${error.message}`,
+      });
+    }
+  }
+}
 
-async function refreshAccessToken(req, res) {}
+async function refreshAccessToken(req, res) {
+  let { refreshToken, user } = req.body;
+  refreshToken = refreshToken.trim();
+  if (!refreshToken) {
+    return res.status(400).json({ message: "Refresh token not received!" });
+  }
+  let validRefreshToken;
+  try {
+    validRefreshToken = await RefreshToken.findOne({
+      refreshToken: refreshToken,
+    });
+    if (!validRefreshToken) {
+      return res.status(400).json({ message: "Refresh token not found!" });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: `An error occured while looking for refresh token: ${error.message}`,
+    });
+  }
+  if (validRefreshToken.expiresAt < Date.now()) {
+    return res.status(400).json({ message: "Refresh token expired!" }); //Make sure to re-direct to login page
+  }
+  let newAccessToken = jwt.sign(
+    { userId: validRefreshToken.user },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_LIFE }
+  );
+  return res.status(200).json({ accessToken: newAccessToken });
+}
 
-async function forgotPassword(req, res) {}
-
-async function resetPassword(req, res) {}
-
-async function logoutUser(req, res) {}
+async function logoutUser(req, res) {
+  let { refreshToken } = req.body;
+  refreshToken = refreshToken.trim();
+  if (!refreshToken) {
+    return res.status(400).json({ message: "Refresh token not found!" });
+  } else {
+    try {
+      const deletedRefreshToken = await RefreshToken.findOneAndDelete({
+        refreshToken: refreshToken,
+      });
+      if (deletedRefreshToken) {
+        return res.status(200).json({ message: "User logged out!" });
+      } else {
+        return res.status(400).json({ message: "Refresh token not found!" });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        message: `An error occured while logging out : ${error.message}`,
+      });
+    }
+  }
+}
 
 module.exports = {
   addNewUser,
   signinUser,
   refreshAccessToken,
-  forgotPassword,
-  resetPassword,
   logoutUser,
 };
-
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true, // remove extra spaces
-  },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true, // unique email
-  },
-  phone: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true, // unique phone
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now() + 5.5 * 60 * 60 * 1000,
-  },
-  passwordResetToken: {
-    type: String,
-    default: null,
-  },
-  passwordResetExpires: {
-    type: Date,
-    default: null,
-  },
-});
-
-const User = mongoose.model("user", userSchema);
-module.exports = User;
