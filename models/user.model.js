@@ -10,23 +10,23 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true, // unique email
+    unique: true,
   },
   phone: {
     type: String,
     required: true,
     trim: true,
-    unique: true, // unique phone
+    unique: true,
   },
   password: {
     type: String,
     required: true,
     trim: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now() + 5.5 * 60 * 60 * 1000,
-  },
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now() + 5.5 * 60 * 60 * 1000,
+  // },
   // passwordResetToken: {
   //   type: String,
   //   default: null,

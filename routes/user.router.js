@@ -1,5 +1,12 @@
 const express = require("express");
 
+const {
+  addNewUser,
+  signinUser,
+  refreshAccessToken,
+  logoutUser,
+} = require("../controllers/user.controller");
+
 const userRouter = express.Router();
 
 userRouter.post("/signup", addNewUser);

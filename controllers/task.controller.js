@@ -4,7 +4,7 @@ const Task = require("../models/task.model");
 
 async function getAllTasks(req, res) {
   try {
-    const { user } = req.query;
+    const { user } = req.query; // user id is sent with query
     let response = await Task.find({ user: user });
     if (response) {
       res.status(200).json({ data: response, message: "All tasks found" });
@@ -18,7 +18,7 @@ async function getAllTasks(req, res) {
 
 async function createTask(req, res) {
   try {
-    let { title, description, completed, endDate, user } = req.body; // user sent in body
+    let { title, description, completed, endDate, user } = req.body; // user id is sent with body
     let task = new Task({
       title: title,
       description: description,
@@ -60,7 +60,7 @@ async function getTask(req, res) {
 async function updateTask(req, res) {
   try {
     let { id } = req.params.id;
-    let { title, description, completed, endDate, user } = req.body; // user sent in body
+    let { title, description, completed, endDate } = req.body;
     let task = await Task.findById(id);
     if (task) {
       task.title = title;

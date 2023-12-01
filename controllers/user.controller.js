@@ -53,9 +53,13 @@ async function addNewUser(req, res) {
       if (emailExist) {
         return res.status(400).json({ message: "Email already exists!" });
       }
+      const phoneExist = await User.findOne({ phone: phone });
+      if (phoneExist) {
+        return res.status(400).json({ message: "Phone no. already in use!" });
+      }
     } catch (error) {
       return res.status(500).json({
-        message: `An error occured while checking for email: ${error.message}`,
+        message: `An error occured while checking for email and phone number: ${error.message}`,
       });
     }
     // save user
@@ -101,7 +105,7 @@ async function addNewUser(req, res) {
       });
     } catch (error) {
       return res.status(500).json({
-        message: `An error occured while saving refresh token: ${error.message}`,
+        message: `An error occured while saving refresh token, error while signing up: ${error.message}`,
       });
     }
   }
@@ -204,7 +208,7 @@ async function refreshAccessToken(req, res) {
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_LIFE }
   );
-  return res.status(200).json({ accessToken: newAccessToken });
+  return res.status(200).json({ accessToken: newAccessToken }); // send new access token
 }
 
 async function logoutUser(req, res) {

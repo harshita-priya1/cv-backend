@@ -1,7 +1,13 @@
 const express = require("express");
 
 const validateToken = require("../middlewares/validateToken.middleware");
-
+const {
+  getAllTasks,
+  createTask,
+  getTask,
+  updateTask,
+  deleteTask,
+} = require("../controllers/task.controller");
 const taskRouter = express.Router();
 
 taskRouter.use(validateToken);

@@ -8,6 +8,7 @@ const RefreshToken = require("../models/refreshToken.model");
 
 async function validateToken(req, res, next) {
   // get user id and access token from request
+  let { refreshToken } = req.body;
   let accessToken;
   let userId = req.body.user._id; // issues with this line everywhere review later    send user id is always sent with request
   // check if token is in request body
@@ -33,8 +34,10 @@ async function validateToken(req, res, next) {
       // if token is expired get refresh token from db and generate new access token
       console.log("token expired");
       try {
-        const refreshToken = await RefreshToken.findOne({ userId: userId });
-        if (!refreshToken) {
+        const validRefreshToken = await RefreshToken.findOne({
+          refreshToken: refreshToken,
+        });
+        if (!validRefreshToken) {
           // if refresh token not found
           return res.status(401).json({ message: "Refresh token not found" });
         } else {
@@ -42,16 +45,16 @@ async function validateToken(req, res, next) {
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET
           );
-          let expiryDateRT = new Date(decodedRefreshToken.exp * 1000);
-          if (expiryDateRT > Date.now()) {
+          const expiresAt = validRefreshToken.expiresAt;
+          if (expiresAt > Date.now()) {
             // if refresh token is not expired
             console.log("refresh token is valid");
             const newAccessToken = jwt.sign(
-              { userId: userId },
+              { userId: decodedRefreshToken.userId },
               process.env.ACCESS_TOKEN_SECRET,
-              { expiresIn: "15m" }
+              { expiresIn: process.env.ACCESS_TOKEN_LIFE }
             );
-            req.body.accessToken = newAccessToken;
+            res.setHeader("Authorization", `Bearer ${newAccessToken}`); //make sure to access this in the front end
             next();
           } else {
             // if refresh token is expired

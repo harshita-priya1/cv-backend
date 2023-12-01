@@ -15,17 +15,17 @@ const taskSchema = new mongoose.Schema({
     default: false,
   },
   user: {
-    type: mongoose.Schema.Types.ObjectId, // type of data
+    type: mongoose.Schema.Types.ObjectId, //refers to the id of the user model
     required: true,
     ref: "user", // reference to another model
   },
   endDate: {
     type: Date,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now() + 5.5 * 60 * 60 * 1000,
-  },
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now() + 5.5 * 60 * 60 * 1000,
+  // },
 });
 
 const Task = mongoose.model("task", taskSchema);
