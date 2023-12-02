@@ -58,6 +58,7 @@ async function addNewUser(req, res) {
         return res.status(400).json({ message: "Phone no. already in use!" });
       }
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         message: `An error occured while checking for email and phone number: ${error.message}`,
       });
@@ -98,10 +99,7 @@ async function addNewUser(req, res) {
         message: "User created successfully!",
         accessToken: accessToken,
         refreshToken: refreshToken,
-        user: {
-          name: savedUser.name,
-          email: savedUser.email,
-        },
+        user: savedUser,
       });
     } catch (error) {
       return res.status(500).json({
@@ -171,6 +169,7 @@ async function signinUser(req, res) {
         user: {
           name: user.name,
           email: user.email,
+          id: user._id,
         },
       });
     } catch (error) {

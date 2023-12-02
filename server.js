@@ -5,12 +5,15 @@ const dotenv = require("dotenv");
 
 const userRouter = require("./routes/user.router");
 const taskRouter = require("./routes/task.router");
+const connectToDb = require("./models/db");
 
 dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+
+connectToDb();
 
 app.use(cors());
 app.use(bodyParser.json());

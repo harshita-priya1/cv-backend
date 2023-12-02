@@ -10,7 +10,7 @@ async function validateToken(req, res, next) {
   // get user id and access token from request
   let { refreshToken } = req.body;
   let accessToken;
-  let userId = req.body.user._id; // issues with this line everywhere review later    send user id is always sent with request
+  let userId = req.query.user; // issues with this line everywhere review later    send user id is always sent with request
   // check if token is in request body
   if (
     req.headers.authorization &&
@@ -23,6 +23,7 @@ async function validateToken(req, res, next) {
   }
   let decodedToken;
   // find if token is expired
+
   try {
     decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
     let expiryDate = new Date(decodedToken.exp * 1000);
@@ -74,7 +75,7 @@ async function validateToken(req, res, next) {
   } catch (error) {
     return res.status(500).json({
       error: error,
-      message: `Error while verifying access token ${error.message}}`,
+      message: `Error while verifying access token ${error.message}`,
     });
   }
 }
