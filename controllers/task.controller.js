@@ -117,10 +117,41 @@ async function deleteTask(req, res) {
   }
 }
 
+async function changeStatus(req, res) {
+  let id = req.params.id;
+  let task;
+  try {
+    task = Task.findById(id);
+    if (!task) {
+      return res.status(500).json({ message: "Error finding task" });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: error, message: "Error changing status" });
+  }
+  try {
+    task.completed = !task.completed;
+    const updatedTask = await task.save();
+    if (updatedTask) {
+      return res
+        .status(200)
+        .json({ data: updatedTask, message: "Task status updated" });
+    } else {
+      return res.status(500).json({ message: "Error updating task" });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: error, message: "Error changing status" });
+  }
+}
+
 module.exports = {
   getAllTasks,
   createTask,
   getTask,
   updateTask,
   deleteTask,
+  changeStatus,
 };

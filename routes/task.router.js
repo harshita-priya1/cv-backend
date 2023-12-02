@@ -7,6 +7,7 @@ const {
   getTask,
   updateTask,
   deleteTask,
+  changeStatus,
 } = require("../controllers/task.controller");
 const taskRouter = express.Router();
 
@@ -17,5 +18,6 @@ taskRouter.post("/", createTask); // deals with body
 taskRouter.get("/:id", getTask); //deals with params
 taskRouter.put("/:id", updateTask); //deals with params and body
 taskRouter.delete("/:id", deleteTask); //deals with params
+taskRouter.put("/completed/:id", changeStatus); //deals with params and body
 
 module.exports = taskRouter;
