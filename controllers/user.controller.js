@@ -99,7 +99,11 @@ async function addNewUser(req, res) {
         message: "User created successfully!",
         accessToken: accessToken,
         refreshToken: refreshToken,
-        user: savedUser,
+        user: {
+          name: savedUser.name,
+          email: savedUser.email,
+          id: savedUser._id,
+        },
       });
     } catch (error) {
       return res.status(500).json({
