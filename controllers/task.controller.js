@@ -9,7 +9,7 @@ async function getAllTasks(req, res) {
     if (response) {
       return res
         .status(200)
-        .json({ data: response, message: "All tasks found" });
+        .json({ status: 200, data: response, message: "All tasks found" });
     } else {
       return res.status(404).json({ message: "No tasks found!" });
     }
@@ -41,7 +41,9 @@ async function createTask(req, res) {
     }
     const savedTask = await task.save();
     if (savedTask) {
-      return res.status(201).json({ data: savedTask, message: "Task created" });
+      return res
+        .status(201)
+        .json({ status: 201, data: savedTask, message: "Task created" });
     }
   } catch (error) {
     console.log(error);
@@ -58,7 +60,9 @@ async function getTask(req, res) {
     const task = await Task.findById(id);
     console.log(task);
     if (task) {
-      return res.status(200).json({ data: task, message: "Task found" });
+      return res
+        .status(200)
+        .json({ status: 200, data: task, message: "Task found" });
     } else {
       return res.status(404).json({ message: "Task not found" });
     }
@@ -85,7 +89,7 @@ async function updateTask(req, res) {
       if (updatedTask) {
         return res
           .status(200)
-          .json({ data: updatedTask, message: "Task updated" });
+          .json({ status: 200, data: updatedTask, message: "Task updated" });
       } else {
         return res.status(500).json({ message: "Error updating task" });
       }
@@ -106,7 +110,7 @@ async function deleteTask(req, res) {
     if (deletedTask) {
       return res
         .status(200)
-        .json({ data: deletedTask, message: "Task deleted" });
+        .json({ status: 200, data: deletedTask, message: "Task deleted" });
     } else {
       return res.status(404).json({ message: "Task not found" });
     }
@@ -134,9 +138,11 @@ async function changeStatus(req, res) {
     task.completed = !task.completed;
     const updatedTask = await task.save();
     if (updatedTask) {
-      return res
-        .status(200)
-        .json({ data: updatedTask, message: "Task status updated" });
+      return res.status(200).json({
+        status: 200,
+        data: updatedTask,
+        message: "Task status updated",
+      });
     } else {
       return res.status(500).json({ message: "Error updating task" });
     }
