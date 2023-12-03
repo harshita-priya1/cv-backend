@@ -8,7 +8,7 @@ const RefreshToken = require("../models/refreshToken.model");
 
 async function validateToken(req, res, next) {
   // get user id and access token from request
-  let { refreshToken } = req.body;
+  let refreshToken = req.query.refreshToken;
   let accessToken;
   let userId = req.query.user; // issues with this line everywhere review later    send user id is always sent with request
   // check if token is in request body
