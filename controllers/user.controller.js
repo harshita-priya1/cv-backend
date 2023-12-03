@@ -99,6 +99,7 @@ async function addNewUser(req, res) {
         message: "User created successfully!",
         accessToken: accessToken,
         refreshToken: refreshToken,
+        status: 201,
         user: {
           name: savedUser.name,
           email: savedUser.email,
@@ -170,6 +171,7 @@ async function signinUser(req, res) {
         message: "User signed in successfully!",
         accessToken: accessToken,
         refreshToken: refreshToken,
+        status: 200,
         user: {
           name: user.name,
           email: user.email,
@@ -211,7 +213,7 @@ async function refreshAccessToken(req, res) {
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_LIFE }
   );
-  return res.status(200).json({ accessToken: newAccessToken }); // send new access token
+  return res.status(200).json({ accessToken: newAccessToken, status: 200 }); // send new access token
 }
 
 async function logoutUser(req, res) {
@@ -225,7 +227,9 @@ async function logoutUser(req, res) {
         refreshToken: refreshToken,
       });
       if (deletedRefreshToken) {
-        return res.status(200).json({ message: "User logged out!" });
+        return res
+          .status(200)
+          .json({ message: "User logged out!", status: 200 });
       } else {
         return res.status(400).json({ message: "Refresh token not found!" });
       }
