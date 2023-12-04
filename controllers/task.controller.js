@@ -24,6 +24,14 @@ async function createTask(req, res) {
   try {
     let { title, description, completed, endDate } = req.body;
     let { user } = req.query; // user id is sent with query
+    if (
+      !completed ||
+      completed === null ||
+      completed === undefined ||
+      completed === ""
+    ) {
+      completed = false;
+    }
     let task = new Task({
       title: title,
       description: description,
@@ -76,12 +84,11 @@ async function getTask(req, res) {
 async function updateTask(req, res) {
   try {
     let id = req.params.id;
-    let { title, description, completed, endDate } = req.body;
+    let { title, description, endDate } = req.body;
     let task = await Task.findById(id);
     if (task) {
-      task.title = title;
-      task.description = description;
-      task.completed = completed;
+      if (title) task.title = title;
+      if (description) task.description = description;
       if (endDate) {
         task.endDate = endDate;
       }
@@ -125,7 +132,7 @@ async function changeStatus(req, res) {
   let id = req.params.id;
   let task;
   try {
-    task = Task.findById(id);
+    task = await Task.findById(id);
     if (!task) {
       return res.status(500).json({ message: "Error finding task" });
     }

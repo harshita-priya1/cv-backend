@@ -11,7 +11,7 @@ const {
 } = require("../controllers/task.controller");
 const taskRouter = express.Router();
 
-taskRouter.use(validateToken);
+// taskRouter.use(validateToken);
 
 taskRouter.get("/", getAllTasks); //deals with query
 taskRouter.post("/", createTask); // deals with body
