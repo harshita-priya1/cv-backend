@@ -76,17 +76,17 @@ async function addNewUser(req, res) {
     const accessToken = jwt.sign(
       { userId: savedUser._id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_LIFE }
+      { expiresIn: "1h" }
     );
     const refreshToken = jwt.sign(
       { userId: savedUser._id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_LIFE }
+      { expiresIn: "12h" }
     );
     // save refresh token
     let expiresAt = new Date();
     expiresAt.setSeconds(
-      expiresAt.getSeconds() + process.env.REFRESH_TOKEN_LIFE // life in seconds
+      expiresAt.getSeconds() + 12 * 60 * 60 // life in seconds
     );
     const newRefreshToken = new RefreshToken({
       refreshToken: refreshToken,
@@ -148,17 +148,15 @@ async function signinUser(req, res) {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_LIFE }
+      { expiresIn: "1h" }
     );
     const refreshToken = jwt.sign(
       { userId: user._id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_LIFE }
+      { expiresIn: "12h" }
     );
     const expiresAt = new Date();
-    expiresAt.setSeconds(
-      expiresAt.getSeconds() + process.env.REFRESH_TOKEN_LIFE
-    );
+    expiresAt.setSeconds(expiresAt.getSeconds() + 12 * 60 * 60);
     // save refresh token
     const newRefreshToken = new RefreshToken({
       refreshToken: refreshToken,
@@ -187,7 +185,7 @@ async function signinUser(req, res) {
 }
 
 async function refreshAccessToken(req, res) {
-  let { refreshToken, user } = req.body;
+  let { refreshToken } = req.body;
   refreshToken = refreshToken.trim();
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token not received!" });
@@ -211,7 +209,7 @@ async function refreshAccessToken(req, res) {
   let newAccessToken = jwt.sign(
     { userId: validRefreshToken.user },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_LIFE }
+    { expiresIn: "1h" }
   );
   return res.status(200).json({ accessToken: newAccessToken, status: 200 }); // send new access token
 }

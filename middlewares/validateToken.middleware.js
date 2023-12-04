@@ -27,7 +27,9 @@ async function validateToken(req, res, next) {
   try {
     decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
     let expiryDate = new Date(decodedToken.exp * 1000);
+
     if (expiryDate > Date.now()) {
+      //date.now() returns milliseconds
       // if token is not expired
       console.log("token is valid");
       next();
@@ -53,9 +55,9 @@ async function validateToken(req, res, next) {
             const newAccessToken = jwt.sign(
               { userId: decodedRefreshToken.userId },
               process.env.ACCESS_TOKEN_SECRET,
-              { expiresIn: process.env.ACCESS_TOKEN_LIFE }
+              { expiresIn: "1h" }
             );
-            res.setHeader("Authorization", `Bearer ${newAccessToken}`); //make sure to access this in the front end
+            res.status(200).json({ accessToken: newAccessToken });
             next();
           } else {
             // if refresh token is expired
