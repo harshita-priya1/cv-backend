@@ -1,9 +1,9 @@
 # cv-backend- The Backend for the CV assignment
-## server for the Task app
-## Uses Node.js, express.js and MongoDB 
-## jwt for authentication
-## Digital Ocean for hosting
-## Frontend is in Angular
+- ## server for the Task app
+- ## Uses Node.js, express.js and MongoDB 
+- ## jwt for authentication
+- ## Digital Ocean for hosting
+- ## Frontend is in Angular
 
 #To run locally, follow these steps:
 - Clone using git clone command
