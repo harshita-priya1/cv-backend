@@ -5,7 +5,7 @@
 - ## Digital Ocean for hosting
 - ## Frontend is in Angular
 
-#To run locally, follow these steps:
+# To run locally, follow these steps:
 - Clone using git clone command
 - use npm install command to install all dependencies
 - Create a .env file for all environment variables, in our case, MONGODB_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET
