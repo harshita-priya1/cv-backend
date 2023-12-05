@@ -1,4 +1,4 @@
-# cv-backend- The Backend for the CV assignment
+# Cv-backend- The Backend for the CV assignment
 - ## Server for the Task app
 - ## Uses Node.js, express.js and MongoDB 
 - ## Used JWT for authentication
