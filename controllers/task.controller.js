@@ -9,14 +9,14 @@ async function getAllTasks(req, res) {
     if (response) {
       return res
         .status(200)
-        .json({ status: 200, data: response, message: "All tasks found" });
+        .json({ status: 200, data: response, message: "All tasks found!" });
     } else {
-      return res.status(404).json({ message: "No tasks found!" });
+      return res.status(404).json({ message: "No task found!" });
     }
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Error getting all tasks" });
+      .json({ error: error, message: "Error getting all tasks!" });
   }
 }
 
@@ -31,6 +31,9 @@ async function createTask(req, res) {
       completed === ""
     ) {
       completed = false;
+    }
+    if (title === null || title === undefined || title === "") {
+      return res.status(400).json({ message: "Title is required!" });
     }
     let task = new Task({
       title: title,
@@ -51,13 +54,13 @@ async function createTask(req, res) {
     if (savedTask) {
       return res
         .status(201)
-        .json({ status: 201, data: savedTask, message: "Task created" });
+        .json({ status: 201, data: savedTask, message: "Task created!" });
     }
   } catch (error) {
     console.log(error);
     return res
       .status(500)
-      .json({ error: error, message: "Error creating task" });
+      .json({ error: error, message: "Error creating task!" });
   }
 }
 
@@ -70,14 +73,14 @@ async function getTask(req, res) {
     if (task) {
       return res
         .status(200)
-        .json({ status: 200, data: task, message: "Task found" });
+        .json({ status: 200, data: task, message: "Task found!" });
     } else {
-      return res.status(404).json({ message: "Task not found" });
+      return res.status(404).json({ message: "Task not found!" });
     }
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Error getting task" });
+      .json({ error: error, message: "Error getting task!" });
   }
 }
 
@@ -87,8 +90,12 @@ async function updateTask(req, res) {
     let { title, description, endDate } = req.body;
     let task = await Task.findById(id);
     if (task) {
-      if (title) task.title = title;
-      if (description) task.description = description;
+      if (title) {
+        task.title = title;
+      }
+      if (description) {
+        task.description = description;
+      }
       if (endDate) {
         task.endDate = endDate;
       }
@@ -96,17 +103,17 @@ async function updateTask(req, res) {
       if (updatedTask) {
         return res
           .status(200)
-          .json({ status: 200, data: updatedTask, message: "Task updated" });
+          .json({ status: 200, data: updatedTask, message: "Task updated!" });
       } else {
-        return res.status(500).json({ message: "Error updating task" });
+        return res.status(500).json({ message: "Error updating task!" });
       }
     } else {
-      return res.status(404).json({ message: "Task not found" });
+      return res.status(404).json({ message: "Task not found!" });
     }
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Error updating task" });
+      .json({ error: error, message: "Error updating task!" });
   }
 }
 
@@ -117,14 +124,14 @@ async function deleteTask(req, res) {
     if (deletedTask) {
       return res
         .status(200)
-        .json({ status: 200, data: deletedTask, message: "Task deleted" });
+        .json({ status: 200, data: deletedTask, message: "Task deleted!" });
     } else {
-      return res.status(404).json({ message: "Task not found" });
+      return res.status(404).json({ message: "Task not found!" });
     }
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Error deleting task" });
+      .json({ error: error, message: "Error deleting task!" });
   }
 }
 
@@ -134,12 +141,12 @@ async function changeStatus(req, res) {
   try {
     task = await Task.findById(id);
     if (!task) {
-      return res.status(500).json({ message: "Error finding task" });
+      return res.status(500).json({ message: "Error finding task!" });
     }
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Error changing status" });
+      .json({ error: error, message: "Error changing status!" });
   }
   try {
     task.completed = !task.completed;
@@ -148,15 +155,15 @@ async function changeStatus(req, res) {
       return res.status(200).json({
         status: 200,
         data: updatedTask,
-        message: "Task status updated",
+        message: "Task status updated!",
       });
     } else {
-      return res.status(500).json({ message: "Error updating task" });
+      return res.status(500).json({ message: "Error updating task!" });
     }
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Error changing status" });
+      .json({ error: error, message: "Error changing status!" });
   }
 }
 
